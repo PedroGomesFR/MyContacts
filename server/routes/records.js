@@ -1,48 +1,62 @@
-import express from 'express';
-import connectDB from '../db/connection.js';
+import connectDB from "../db/connection.js";
+import express from "express";
+import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
-router.get('/users', async (req, res) => {
+router.get("/users", async (req, res) => {
   try {
     const db = await connectDB();
-    const records = await db.collection('User').find().toArray();
+    const records = await db.collection("User").find().toArray();
     res.json(records);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-router.post('/addUser', async (req, res) => {
+router.post("/addUser", async (req, res) => {
   try {
-    const name = req.body.name || "";
+    const name = req.body.name;
+    const fname = req.body.fname || "";
     const age = req.body.age || "";
-    if (!name || !age) {
-    return res.status(400).json({ error: 'Name and age are required.' });
+    const email = req.body.email || "";
+    const password = req.body.password || "";
+
+    if (!name || !age || !email || !password || !fname) {
+      return res.status(400).json({
+        error: "Name, family name, age, email, and password are required !",
+      });
     }
     const db = await connectDB();
-    const result = await db.collection('User').insertOne({ name, age });
-    res.status(201).json({ _id: result.insertedId, name, age });
+    const result = await db
+      .collection("User")
+      .insertOne({ name, fname, age, email, password });
+    res
+      .status(201)
+      .json({ _id: result.insertedId, name, fname, age, email, password });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
-router.get('/login/:name', async (req, res) => {
+router.post("/login", async (req, res) => {
   try {
-    const name = req.params.name;
+    const email = req.body.email;
+    const password = req.body.password;
+
     const db = await connectDB();
-    const user = await db.collection('User').findOne({ name });
+    const user = await db.collection("User").findOne({ email, password });
+
     if (user) {
       res.json(user);
     } else {
-      res.status(404).json({ error: 'User not found' });
+      res.status(404).json({ error: "User not found or incorrect password" });
     }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

@@ -1,0 +1,10 @@
+.MyContacts-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--mainColor);
+  position: sticky;
+  top: 0;
+  left: 0;
+}
