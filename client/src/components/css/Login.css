@@ -1,4 +1,42 @@
+.loginContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
 .login {
-  h1 {
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 50vh;
+  max-height: 80vh;
+  border: solid 1px black;
+  padding: 5px;
+}
+
+.login input {
+  margin: 10px;
+  padding: 10px;
+  width: 80%;
+  border: solid 1px black;
+  border-radius: 5px;
+}
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.login button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
 }
