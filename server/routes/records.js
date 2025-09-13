@@ -34,7 +34,14 @@ router.post("/addUser", async (req, res) => {
       .insertOne({ name, fname, age, email, password });
     res
       .status(201)
-      .json({ _id: result.insertedId, name, fname, age, email, password });
+      .json({
+        user: {
+          _id: result.insertedId,
+          name:name,
+          fname:fname,
+          age:age,
+          email:email,
+      }});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal server error" });
