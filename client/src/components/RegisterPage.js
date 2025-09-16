@@ -1,5 +1,6 @@
 import "./css/Register.css";
-import { useNavigate } from "react-router-dom";
+import "./css/Login.css";
+import { Link, useNavigate } from "react-router-dom";
 import Input from "./Input";
 import { useState } from "react";
 
@@ -9,7 +10,7 @@ function RegisterPage({ user, setUser }) {
   const [formData, setFormData] = useState({
     name: "",
     fname: "",
-    age: "",
+    numero: "",
     email: "",
     password: "",
   });
@@ -30,10 +31,12 @@ function RegisterPage({ user, setUser }) {
         alert("not good");
       } else {
         localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("token", data.token);
         setUser(data.user);
         navigate("/profile");
       }
     } catch (error) {
+      console.error("Error during registration:", error);
     } finally {
       setLoading(false);
     }
@@ -48,58 +51,63 @@ function RegisterPage({ user, setUser }) {
   };
 
   return (
-    <div className="register-container">
-      <h2>Register</h2>
-      <form method="POST">
-        <Input
-          type="text"
-          name="name"
-          placeholder="Prenom"
-          label="Prenom"
-          value={formData.name}
-          require={true}
-          onChange={handleChange}
-        />
-        <Input
-          type="text"
-          name="fname"
-          placeholder="Nom"
-          label="Nom"
-          value={formData.fname}
-          require={true}
-          onChange={handleChange}
-        />
-        <Input
-          type="number"
-          name="age"
-          placeholder="Age"
-          label="Age"
-          value={formData.age}
-          require={true}
-          onChange={handleChange}
-        />
-        <Input
-          type="email"
-          name="email"
-          placeholder="Email"
-          label="Email"
-          value={formData.email}
-          require={true}
-          onChange={handleChange}
-        />
-        <Input
-          type="password"
-          name="password"
-          placeholder="Password"
-          label="Password"
-          value={formData.password}
-          require={true}
-          onChange={handleChange}
-        />
-        <button onClick={handleRegiste}>
-          {loading ? "loading" : "Resgister"}
-        </button>
-      </form>
+    <div className="loginContainer">
+      <div className="login">
+        <h2>Register</h2>
+        <form method="POST">
+          <Input
+            type="text"
+            name="name"
+            placeholder="Prenom"
+            label="Prenom"
+            value={formData.name}
+            require={true}
+            onChange={handleChange}
+          />
+          <Input
+            type="text"
+            name="fname"
+            placeholder="Nom"
+            label="Nom"
+            value={formData.fname}
+            require={true}
+            onChange={handleChange}
+          />
+          <Input
+            type="number"
+            name="numero"
+            placeholder="numero"
+            label="numero"
+            value={formData.numero}
+            require={true}
+            onChange={handleChange}
+          />
+          <Input
+            type="email"
+            name="email"
+            placeholder="Email"
+            label="Email"
+            value={formData.email}
+            require={true}
+            onChange={handleChange}
+          />
+          <Input
+            type="password"
+            name="password"
+            placeholder="Password"
+            label="Password"
+            value={formData.password}
+            require={true}
+            onChange={handleChange}
+          />
+          <button onClick={handleRegiste} className="buttonContainer">
+            {loading ? "loading" : "Resgister"}
+          </button>
+        </form>
+      </div>
+      <Link to="/login" className="registerLink">
+        Deja un compte ? Se connecter
+      </Link>
     </div>
   );
 }

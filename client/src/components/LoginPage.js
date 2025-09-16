@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 function LoginPage({ user, setUser }) {
   const navigate = useNavigate();
 
+  console.log("no user present ");
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -40,10 +42,9 @@ function LoginPage({ user, setUser }) {
       if (!response.ok) {
         alert("email ou mot de passe incorrect");
       } else {
-        // alert("Login successful!" + data);
-        localStorage.setItem("user", JSON.stringify(data));
-        setUser(data);
-        // Redirect to profile page
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("token", data.token);
+        setUser(data.user);
         navigate("/profile");
       }
     } catch (error) {
@@ -81,12 +82,12 @@ function LoginPage({ user, setUser }) {
             <button type="submit" onClick={handleLogin}>
               Login
             </button>
-            <Link to="/register" className="registerLink">
-              Register
-            </Link>
           </div>
         </form>
       </div>
+      <Link to="/register" className="registerLink">
+        Pas de compte ? S'inscrire
+      </Link>
     </div>
   );
 }

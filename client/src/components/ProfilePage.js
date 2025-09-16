@@ -1,40 +1,58 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import Input from "./Input";
 import "./css/ProfilePage.css";
 
 function ProfilePage({ user }) {
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
-  const [allUsers, setAllUsers] = useState([]);
-  const [mycontacts, setMyContacts] = useState([]);
 
+  const [addContacts, setAddContacts] = useState({
+    name: "",
+    fname: "",
+    numero: "",
+  });
+  const [mycontacts, setMyContacts] = useState([]);
+  const [editingContactId, setEditingContactId] = useState(null);
+  const [editContact, setEditContact] = useState({
+    name: "",
+    fname: "",
+    numero: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setAddContacts((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditContact((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  //redirige vers login si pas de user
   useEffect(() => {
     if (!user || Object.keys(user).length === 0) {
       navigate("/login");
     }
   }, [user, navigate]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await fetch("/record/allUsers");
-        const data = await response.json();
-        if (response.ok) {
-          setAllUsers(data);
-          console.log(`Fetched ${data.length} users from server`);
-        } else {
-          console.log("Failed to fetch users");
-        }
-      } catch (error) {
-        console.log("Error fetching users:", error);
-      }
-    };
-    fetchUsers();
-  }, []);
-
+  //fetch tous les contact enregistrer
   useEffect(() => {
     const fetchMyContacts = async () => {
       try {
-        const response = await fetch("/record/myContacts");
+        const response = await fetch(`/record/myContacts/${user._id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         const data = await response.json();
         if (response.ok) {
           setMyContacts(data);
@@ -46,41 +64,132 @@ function ProfilePage({ user }) {
       }
     };
     fetchMyContacts();
-  }, []);
+  }, [user._id]);
 
-  const handleAddContact = async (contactId) => {
+  //ajout contact
+  const handleAddContact = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+
     if (!user || Object.keys(user).length === 0) {
       return null;
     }
+
     try {
       const response = await fetch("/record/addContact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ userId: user._id, contactId }),
+        body: JSON.stringify({
+          userId: user._id,
+          name: addContacts.name,
+          fname: addContacts.fname,
+          numero: addContacts.numero,
+        }),
       });
+      const data = await response.json();
 
       if (response.ok) {
-        // After successful contact add, fetch updated contacts list
-        const contactsResponse = await fetch("/record/myContacts");
-        const contactsData = await contactsResponse.json();
-        if (contactsResponse.ok) {
-          setMyContacts(contactsData);
-        }
+        console.log("Contact added successfully:", data);
+        setMyContacts((prevContacts) => [...prevContacts, data.contact]);
+        // Clear the form after successful addition
+        setAddContacts({
+          name: "",
+          fname: "",
+          numero: "",
+        });
       } else {
-        console.log("Failed to add contact");
+        console.log(
+          "Failed to add contact:",
+          JSON.stringify(data) || "Unknown error"
+        );
       }
     } catch (error) {
       console.log("Error adding contact:", error);
     }
   };
 
-  const { name, fname, age, email } = user;
+  const handleRemoveContact = async (contactId) => {
+    if (!user || Object.keys(user).length === 0) {
+      return null;
+    }
+    try {
+      const response = await fetch("/record/removeContact", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId: user._id,
+          contactId: contactId,
+        }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Contact removed successfully:", data);
+        setMyContacts((prevContacts) =>
+          prevContacts.filter((contact) => contact._id !== contactId)
+        );
+      } else {
+        console.log(
+          "Failed to remove contact:",
+          JSON.stringify(data) || "Unknown error"
+        );
+      }
+    } catch (error) {
+      console.log("Error removing contact:", error);
+    }
+  };
 
+  const handleSaveContact = async (contactId) => {
+    if (!user || Object.keys(user).length === 0) {
+      return null;
+    }
+    try {
+      const response = await fetch("/record/editContact", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId: user._id,
+          contactId: contactId,
+          updatedContact: editContact,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log("Contact updated successfully:", data);
+        setMyContacts((prevContacts) =>
+          prevContacts.map((contact) =>
+            contact._id === contactId ? { ...contact, ...editContact } : contact
+          )
+        );
+        // Exit edit mode
+        setEditingContactId(null);
+      } else {
+        console.log(
+          "Failed to update contact:",
+          JSON.stringify(data) || "Unknown error"
+        );
+      }
+    } catch (error) {
+      console.log("Error updating contact:", error);
+    }
+  };
+
+  const { name, fname, numero, email } = user;
+
+  //deconnexion
   const deconnexion = () => {
     localStorage.removeItem("user");
-    navigate("/login"); // Redirect to login page
+    localStorage.removeItem("token");
+    navigate("/login");
   };
 
   return (
@@ -94,7 +203,7 @@ function ProfilePage({ user }) {
           <strong>Nom:</strong> {fname}
         </p>
         <p>
-          <strong>Age:</strong> {age}
+          <strong>Numero:</strong> {numero}
         </p>
         <p>
           <strong>Email:</strong> {email}
@@ -103,31 +212,109 @@ function ProfilePage({ user }) {
         <button onClick={deconnexion}>Deconnexion</button>
       </div>
       <div className="usersSection">
-        <div className="all-users" id="allUsers">
-          {allUsers.map((element) => (
-            <div className="userList" key={element._id}>
-              <p>
-                {element.name} : {element.fname}
-              </p>
-
-              <p className="idUser" style={{ display: "none" }}>
-                ID: {element._id}
-              </p>
-              <button onClick={() => handleAddContact(element._id)}>
-                Add Contact
-              </button>
-            </div>
-          ))}
+        <div className="ajoutContact">
+          <h3>Ajouter un contact</h3>
+          <Input
+            type="text"
+            name="name"
+            placeholder="Prenom"
+            label="Prenom"
+            value={addContacts.name}
+            require={true}
+            onChange={handleChange}
+          />
+          <Input
+            type="text"
+            name="fname"
+            placeholder="Nom"
+            label="Nom"
+            value={addContacts.fname}
+            require={true}
+            onChange={handleChange}
+          />
+          <Input
+            type="text"
+            name="numero"
+            placeholder="Numero"
+            label="Numero"
+            value={addContacts.numero}
+            require={true}
+            onChange={handleChange}
+          />
+          <div className="buttonContainer">
+            <button type="submit" onClick={handleAddContact}>
+              Ajouter Contact
+            </button>
+          </div>
         </div>
-
-        <div className="all-users" id="allUsers">
+        <div className="ajoutContact" id="allUsers">
+          <h3>Liste des contacts ({mycontacts.length})</h3>
           {mycontacts.map((element) => (
-            <div key={element._id}>
-              <p>{element.name}</p>
-              <p className="idUser" style={{ display: "none" }}>
-                ID: {element._id}
-              </p>
-              <button>Remove Contact</button>
+            <div key={element._id || element.numero} className="contact-item">
+              {editingContactId === element._id ? (
+                // Edit mode
+                <div className="edit-form">
+                  <Input
+                    type="text"
+                    name="name"
+                    placeholder="Prenom"
+                    label="Prenom"
+                    value={editContact.name}
+                    require={true}
+                    onChange={handleEditChange}
+                  />
+                  <Input
+                    type="text"
+                    name="fname"
+                    placeholder="Nom"
+                    label="Nom"
+                    value={editContact.fname}
+                    require={true}
+                    onChange={handleEditChange}
+                  />
+                  <Input
+                    type="text"
+                    name="numero"
+                    placeholder="Numero"
+                    label="Numero"
+                    value={editContact.numero}
+                    require={true}
+                    onChange={handleEditChange}
+                  />
+                  <div className="button-group">
+                    <button onClick={() => handleSaveContact(element._id)}>
+                      Save
+                    </button>
+                    <button onClick={() => setEditingContactId(null)}>
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                // Display mode
+                <>
+                  <p>
+                    {element.name} {element.fname} : {element.numero}
+                  </p>
+                  <div className="button-group">
+                    <button onClick={() => handleRemoveContact(element._id)}>
+                      Remove Contact
+                    </button>
+                    <button
+                      onClick={() => {
+                        setEditingContactId(element._id);
+                        setEditContact({
+                          name: element.name || "",
+                          fname: element.fname || "",
+                          numero: element.numero || "",
+                        });
+                      }}
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>
