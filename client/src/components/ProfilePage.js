@@ -47,12 +47,15 @@ function ProfilePage({ user }) {
   useEffect(() => {
     const fetchMyContacts = async () => {
       try {
-        const response = await fetch(`/record/myContacts/${user._id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/record/myContacts/${user._id}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         const data = await response.json();
         if (response.ok) {
           setMyContacts(data);
@@ -63,8 +66,12 @@ function ProfilePage({ user }) {
         console.log("Error fetching my contacts:", error);
       }
     };
-    fetchMyContacts();
-  }, [user._id]);
+
+    // Ne déclenchez fetchMyContacts que si user._id existe
+    if (user && user._id) {
+      fetchMyContacts();
+    }
+  }, [user, user._id, token]);
 
   //ajout contact
   const handleAddContact = async (e) => {
@@ -75,19 +82,22 @@ function ProfilePage({ user }) {
     }
 
     try {
-      const response = await fetch("/record/addContact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          userId: user._id,
-          name: addContacts.name,
-          fname: addContacts.fname,
-          numero: addContacts.numero,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/record/addContact`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            userId: user._id,
+            name: addContacts.name,
+            fname: addContacts.fname,
+            numero: addContacts.numero,
+          }),
+        }
+      );
       const data = await response.json();
 
       if (response.ok) {
@@ -115,17 +125,20 @@ function ProfilePage({ user }) {
       return null;
     }
     try {
-      const response = await fetch("/record/removeContact", {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          userId: user._id,
-          contactId: contactId,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/record/removeContact`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            userId: user._id,
+            contactId: contactId,
+          }),
+        }
+      );
       const data = await response.json();
       if (response.ok) {
         console.log("Contact removed successfully:", data);
@@ -148,18 +161,21 @@ function ProfilePage({ user }) {
       return null;
     }
     try {
-      const response = await fetch("/record/editContact", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          userId: user._id,
-          contactId: contactId,
-          updatedContact: editContact,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/record/editContact`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            userId: user._id,
+            contactId: contactId,
+            updatedContact: editContact,
+          }),
+        }
+      );
 
       const data = await response.json();
 
