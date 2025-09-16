@@ -19,13 +19,16 @@ function RegisterPage({ user, setUser }) {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch("/record/addUser", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/record/addUser`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
       const data = await response.json();
       if (!response.ok) {
         alert("not good");
