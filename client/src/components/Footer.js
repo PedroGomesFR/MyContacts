@@ -3,7 +3,9 @@ import "./css/Footer.css";
 function Footer() {
   return (
     <footer className="MyContacts-footer">
-      <p>MyContacts Footer</p>
+      <p>
+        fait par <strong>Pedro Gomes</strong>
+      </p>
     </footer>
   );
 }

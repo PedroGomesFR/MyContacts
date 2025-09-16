@@ -1,0 +1,21 @@
+.all-users {
+  border: 1px solid #000000;
+  padding: 10px;
+  margin-top: 20px;
+  overflow: auto;
+  height: 200px;
+  width: 300px;
+  background-color: #f9f9f9;
+}
+
+.all-users-label {
+  font-weight: bold;
+  margin-top: 20px;
+  display: block;
+}
+
+.usersSection {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}

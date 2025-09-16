@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import "./css/ProfilePage.css";
 
-function ProfilePage() {
+function ProfilePage({ user }) {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const [allUsers, setAllUsers] = useState([]);
+  const [mycontacts, setMyContacts] = useState([]);
 
   useEffect(() => {
     if (!user || Object.keys(user).length === 0) {
@@ -11,15 +13,70 @@ function ProfilePage() {
     }
   }, [user, navigate]);
 
-  if (!user || Object.keys(user).length === 0) {
-    return null;
-  }
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch("/record/allUsers");
+        const data = await response.json();
+        if (response.ok) {
+          setAllUsers(data);
+          console.log(`Fetched ${data.length} users from server`);
+        } else {
+          console.log("Failed to fetch users");
+        }
+      } catch (error) {
+        console.log("Error fetching users:", error);
+      }
+    };
+    fetchUsers();
+  }, []);
 
-  const name = user.name;
-  const fname = user.fname;
-  const age = user.age;
-  const email = user.email;
-  console.log(name, fname, age, email);
+  useEffect(() => {
+    const fetchMyContacts = async () => {
+      try {
+        const response = await fetch("/record/myContacts");
+        const data = await response.json();
+        if (response.ok) {
+          setMyContacts(data);
+        } else {
+          console.log("Failed to fetch my contacts");
+        }
+      } catch (error) {
+        console.log("Error fetching my contacts:", error);
+      }
+    };
+    fetchMyContacts();
+  }, []);
+
+  const handleAddContact = async (contactId) => {
+    if (!user || Object.keys(user).length === 0) {
+      return null;
+    }
+    try {
+      const response = await fetch("/record/addContact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: user._id, contactId }),
+      });
+
+      if (response.ok) {
+        // After successful contact add, fetch updated contacts list
+        const contactsResponse = await fetch("/record/myContacts");
+        const contactsData = await contactsResponse.json();
+        if (contactsResponse.ok) {
+          setMyContacts(contactsData);
+        }
+      } else {
+        console.log("Failed to add contact");
+      }
+    } catch (error) {
+      console.log("Error adding contact:", error);
+    }
+  };
+
+  const { name, fname, age, email } = user;
 
   const deconnexion = () => {
     localStorage.removeItem("user");
@@ -44,6 +101,36 @@ function ProfilePage() {
         </p>
 
         <button onClick={deconnexion}>Deconnexion</button>
+      </div>
+      <div className="usersSection">
+        <div className="all-users" id="allUsers">
+          {allUsers.map((element) => (
+            <div className="userList" key={element._id}>
+              <p>
+                {element.name} : {element.fname}
+              </p>
+
+              <p className="idUser" style={{ display: "none" }}>
+                ID: {element._id}
+              </p>
+              <button onClick={() => handleAddContact(element._id)}>
+                Add Contact
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="all-users" id="allUsers">
+          {mycontacts.map((element) => (
+            <div key={element._id}>
+              <p>{element.name}</p>
+              <p className="idUser" style={{ display: "none" }}>
+                ID: {element._id}
+              </p>
+              <button>Remove Contact</button>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

@@ -30,12 +30,15 @@ function App() {
             path="/"
             element={<Navigate to="/login" user={user} setUser={setUser} />}
           />
-          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/login"
+            element={<LoginPage user={user} setUser={setUser} />}
+          />
           <Route
             path="/register"
             element={<RegisterPage user={user} setUser={setUser} />}
           />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={<ProfilePage user={user} />} />
         </Routes>
       </div>
       <Footer />
