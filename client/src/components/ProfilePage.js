@@ -249,13 +249,24 @@ function ProfilePage({ user }) {
             onChange={handleChange}
           />
           <Input
-            type="text"
+            type="tel"
             name="numero"
-            placeholder="Numero"
-            label="Numero"
+            placeholder="numero"
+            label="numero"
             value={addContacts.numero}
             require={true}
-            onChange={handleChange}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Only allow numbers starting with 0 and limit to 10 digits
+              if (
+                (value === "" || value.startsWith("0")) &&
+                value.length <= 10
+              ) {
+                handleChange(e);
+              }
+            }}
+            pattern="0[0-9]{9}"
+            maxLength="10"
           />
           <div className="buttonContainer">
             <button type="submit" onClick={handleAddContact}>
@@ -289,13 +300,24 @@ function ProfilePage({ user }) {
                     onChange={handleEditChange}
                   />
                   <Input
-                    type="text"
+                    type="tel"
                     name="numero"
-                    placeholder="Numero"
-                    label="Numero"
+                    placeholder="numero"
+                    label="numero"
                     value={editContact.numero}
                     require={true}
-                    onChange={handleEditChange}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Only allow numbers starting with 0 and limit to 10 digits
+                      if (
+                        (value === "" || value.startsWith("0")) &&
+                        value.length <= 10
+                      ) {
+                        handleChange(e);
+                      }
+                    }}
+                    pattern="0[0-9]{9}"
+                    maxLength="10"
                   />
                   <div className="button-group">
                     <button onClick={() => handleSaveContact(element._id)}>

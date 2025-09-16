@@ -76,15 +76,27 @@ function RegisterPage({ user, setUser }) {
             require={true}
             onChange={handleChange}
           />
+
           <Input
-            type="number"
+            type="tel"
             name="numero"
             placeholder="numero"
             label="numero"
             value={formData.numero}
             require={true}
-            onChange={handleChange}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (
+                (value === "" || value.startsWith("0")) &&
+                value.length <= 10
+              ) {
+                handleChange(e);
+              }
+            }}
+            pattern="0[0-9]{9}"
+            maxLength="10"
           />
+
           <Input
             type="email"
             name="email"
