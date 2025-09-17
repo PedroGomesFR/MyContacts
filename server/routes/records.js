@@ -21,10 +21,12 @@ router.post("/addUser", async (req, res) => {
       });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const db = await connectDB();
     const result = await db
       .collection("User")
-      .insertOne({ name, fname, numero, email, password });
+      .insertOne({ name, fname, numero, email, password: hashedPassword });
 
     // Generate JWT token
     const token = generateToken(result.insertedId.toString());
