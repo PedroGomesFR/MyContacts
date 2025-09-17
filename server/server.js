@@ -13,6 +13,8 @@ app.use(
     origin: [
       "http://localhost:5050",
       "https://exquisite-custard-0524a7.netlify.app",
+      "http://localhost:3000",
+
     ],
     credentials: true,
   })

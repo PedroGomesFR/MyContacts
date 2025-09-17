@@ -97,7 +97,6 @@ function RegisterPage({ user, setUser }) {
             pattern="0[0-9]{9}"
             maxLength="10"
           />
-
           <Input
             type="email"
             name="email"

@@ -238,6 +238,7 @@ function ProfilePage({ user }) {
             value={addContacts.name}
             require={true}
             onChange={handleChange}
+            style={{ marginBottom: "10px" }}
           />
           <Input
             type="text"
@@ -247,6 +248,7 @@ function ProfilePage({ user }) {
             value={addContacts.fname}
             require={true}
             onChange={handleChange}
+            style={{ marginBottom: "10px" }}
           />
           <Input
             type="tel"

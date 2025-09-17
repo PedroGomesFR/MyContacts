@@ -22,7 +22,6 @@ export const verifyToken = (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    // Add user from payload
     req.userId = decoded.id;
     next();
   } catch (error) {
