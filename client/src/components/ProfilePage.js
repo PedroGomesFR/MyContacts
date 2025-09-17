@@ -338,7 +338,7 @@ function ProfilePage({ user }) {
                   </p>
                   <div className="button-group">
                     <button onClick={() => handleRemoveContact(element._id)}>
-                      Remove Contact
+                      Supprimer
                     </button>
                     <button
                       onClick={() => {
