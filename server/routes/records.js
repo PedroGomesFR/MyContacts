@@ -54,13 +54,19 @@ router.post("/login", async (req, res) => {
     const password = req.body.password;
 
     const db = await connectDB();
-    const user = await db.collection("User").findOne({ email, password });
 
-    if (user) {
-      // Generate JWT token
+    const user = await db.collection("User").findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // compare les mdp hachés
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (isPasswordValid) {
       const token = generateToken(user._id.toString());
 
-      // Return user data with token
       res.json({
         user: {
           _id: user._id,
@@ -72,7 +78,7 @@ router.post("/login", async (req, res) => {
         token,
       });
     } else {
-      res.status(404).json({ error: "User not found or incorrect password" });
+      res.status(401).json({ error: "Incorrect password" });
     }
   } catch (error) {
     console.error(error);
