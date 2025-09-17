@@ -1,6 +1,7 @@
 import connectDB from "../db/connection.js";
 import express from "express";
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import { ObjectId } from "mongodb";
 import { generateToken, verifyToken } from "../middleware/auth.js";
 
