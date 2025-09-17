@@ -29,7 +29,7 @@ router.post("/addUser", async (req, res) => {
       .collection("User")
       .insertOne({ name, fname, numero, email, password: hashedPassword });
 
-    // Generate JWT token
+    // token
     const token = generateToken(result.insertedId.toString());
 
     res.status(201).json({

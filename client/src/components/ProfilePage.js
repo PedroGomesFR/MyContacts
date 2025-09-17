@@ -103,7 +103,7 @@ function ProfilePage({ user }) {
       if (response.ok) {
         console.log("Contact added successfully:", data);
         setMyContacts((prevContacts) => [...prevContacts, data.contact]);
-        // Clear the form after successful addition
+        // vide le fomrmulaire
         setAddContacts({
           name: "",
           fname: "",
@@ -257,7 +257,7 @@ function ProfilePage({ user }) {
             require={true}
             onChange={(e) => {
               const value = e.target.value;
-              // Only allow numbers starting with 0 and limit to 10 digits
+              // numero doit commencer par 0 et max 10 chiffres
               if (
                 (value === "" || value.startsWith("0")) &&
                 value.length <= 10

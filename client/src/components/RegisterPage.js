@@ -85,6 +85,7 @@ function RegisterPage({ user, setUser }) {
             value={formData.numero}
             require={true}
             onChange={(e) => {
+              // numero doit commencer par 0 et max 10 chiffres
               const value = e.target.value;
               if (
                 (value === "" || value.startsWith("0")) &&
