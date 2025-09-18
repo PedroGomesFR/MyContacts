@@ -31,7 +31,8 @@ function RegisterPage({ user, setUser }) {
       );
       const data = await response.json();
       if (!response.ok) {
-        alert("not good");
+        // Affiche le message d'erreur du backend s'il existe
+        alert(data.error || "Erreur lors de l'inscription");
       } else {
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("token", data.token);
@@ -40,6 +41,7 @@ function RegisterPage({ user, setUser }) {
       }
     } catch (error) {
       console.error("Error during registration:", error);
+      alert("Erreur réseau lors de l'inscription");
     } finally {
       setLoading(false);
     }

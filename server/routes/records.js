@@ -18,13 +18,21 @@ router.post("/addUser", async (req, res) => {
 
     if (!name || !numero || !email || !password) {
       return res.status(400).json({
-        error: "Name, numero, email, and password are required!",
+        error: "prenoms, nom, numero, email et mot de passe sont obligatoires",
       });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const db = await connectDB();
+    const emailExists = await db.collection("User").findOne({ email });
+    
+    if (emailExists) {
+      console.log("Email already in use");
+      return res.status(400).json({ error: "Email déjà utilisé", errorEmail: true });
+    }
+      console.log("Email not in use");
+
     const result = await db
       .collection("User")
       .insertOne({ name, fname, numero, email, password: hashedPassword });
